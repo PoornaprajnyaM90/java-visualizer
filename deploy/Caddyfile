@@ -1,0 +1,16 @@
+# Replace javalens.example.com with your domain. Caddy gets and renews the HTTPS certificate automatically.
+javalens.example.com {
+	encode gzip
+	root * /opt/javalens/frontend/dist
+
+	# Anything under /api goes to the Node backend (which only listens on localhost)
+	handle /api/* {
+		reverse_proxy 127.0.0.1:4000
+	}
+
+	# Everything else is the React app
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+}

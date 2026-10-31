@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---- theme tokens: every color in the UI comes from here, so light/dark is one switch ---- */
+:root {
+  --paper: #f2f5fa;   --panel: #ffffff;  --sunken: #eaeff6;
+  --line: #dbe1ea;    --line-strong: #b4bfce;
+  --ink: #111827;     --muted: #566176;  --faint: #98a3b5;
+  --accent: #2c5cf0;  --on-accent: #ffffff;
+  --frame: #dce8fd;   --frame-line: #2c5cf0;
+  --cell: #fdf0c4;    --cell-line: #e8c15d;  --str: #8a4b08;
+  --arrow: #1d4ed8;   --ok: #067a55;   --ret: #be185d;
+  --danger: #b42318;  --danger-soft: #fde8e6;
+  --warn: #8a4b08;    --warn-soft: #fdf0c4;
+  --violet: #6d28d9;  --violet-soft: #ede9fe;
+  --next: #e11d48;    --next-bg: rgba(225, 29, 72, 0.10);
+  --done: #16a34a;    --done-bg: rgba(22, 163, 74, 0.11);
+  --shadow: 0 1px 2px rgba(17, 24, 39, 0.06), 0 8px 24px -12px rgba(17, 24, 39, 0.18);
+}
+.dark {
+  --paper: #080c14;   --panel: #0f1623;  --sunken: #17202f;
+  --line: #222d40;    --line-strong: #394860;
+  --ink: #e8edf6;     --muted: #9aa7bd;  --faint: #637189;
+  --accent: #6b9bff;  --on-accent: #07101f;
+  --frame: #12284d;   --frame-line: #6b9bff;
+  --cell: #3b3210;    --cell-line: #8a7424;  --str: #f3c97a;
+  --arrow: #7fb0ff;   --ok: #5fd6a8;   --ret: #f472b6;
+  --danger: #ff8f85;  --danger-soft: #3a1714;
+  --warn: #f3c97a;    --warn-soft: #33290d;
+  --violet: #c4b0ff;  --violet-soft: #2a2050;
+  --next: #fb7185;    --next-bg: rgba(251, 113, 133, 0.14);
+  --done: #4ade80;    --done-bg: rgba(74, 222, 128, 0.10);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
+@theme inline {
+  --color-paper: var(--paper);       --color-panel: var(--panel);     --color-sunken: var(--sunken);
+  --color-line: var(--line);         --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);           --color-muted: var(--muted);     --color-faint: var(--faint);
+  --color-accent: var(--accent);     --color-on-accent: var(--on-accent);
+  --color-frame: var(--frame);       --color-frame-line: var(--frame-line);
+  --color-cell: var(--cell);         --color-cell-line: var(--cell-line);  --color-str: var(--str);
+  --color-arrow: var(--arrow);       --color-ok: var(--ok);           --color-ret: var(--ret);
+  --color-danger: var(--danger);     --color-danger-soft: var(--danger-soft);
+  --color-warn: var(--warn);         --color-warn-soft: var(--warn-soft);
+  --color-violet: var(--violet);     --color-violet-soft: var(--violet-soft);
+  --color-next: var(--next);         --color-done: var(--done);
+  --shadow-card: var(--shadow);
+}
+@theme inline{
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html, body, #root { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+* { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- editor: green = line that just ran, red = next line to run ---- */
+.line-done { background: var(--done-bg); }
+.line-next { background: var(--next-bg); box-shadow: inset 3px 0 0 var(--next); }
+.arrow-green, .arrow-red { display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+.arrow-green::before { content: "➜"; color: var(--done); }
+.arrow-red::before { content: "➜"; color: var(--next); animation: nudge 0.5s ease-out; }
+@keyframes nudge { from { transform: translateX(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---- a value that changed this step flashes once ---- */
+.changed { animation: flash 1s ease-out; }
+@keyframes flash { from { background-color: color-mix(in srgb, var(--accent) 38%, transparent); } to { background-color: transparent; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .changed, .arrow-red::before { animation: none; }
+  * { transition: none !important; }
+}

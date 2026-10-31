@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://javalens.dev/trace.schema.json",
+  "title": "JavaExecutionTrace",
+  "type": "object",
+  "required": [
+    "version",
+    "status",
+    "steps"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "compile_error",
+        "runtime_error",
+        "timeout",
+        "step_limit"
+      ]
+    },
+    "compileError": {
+      "type": "object",
+      "required": [
+        "line",
+        "message"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "truncated": {
+      "type": "boolean"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/step"
+      }
+    },
+    "message": {
+      "type": "string",
+      "description": "Why no steps were produced (stderr of the program, or a tracer failure)"
+    }
+  },
+  "$defs": {
+    "step": {
+      "type": "object",
+      "required": [
+        "index",
+        "event",
+        "line",
+        "stack",
+        "heap",
+        "stdout",
+        "stderr"
+      ],
+      "properties": {
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "event": {
+          "enum": [
+            "line",
+            "call",
+            "return",
+            "exception",
+            "end"
+          ]
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based line about to execute"
+        },
+        "stack": {
+          "type": "array",
+          "description": "Index 0 = outermost frame; last = active frame",
+          "items": {
+            "$ref": "#/$defs/frame"
+          }
+        },
+        "heap": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/heapObject"
+          }
+        },
+        "stdout": {
+          "type": "string",
+          "description": "Cumulative output up to this step"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "exception": {
+          "type": "string"
+        },
+        "statics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "className",
+              "fields"
+            ],
+            "properties": {
+              "className": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/named"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "frame": {
+      "type": "object",
+      "required": [
+        "method",
+        "line",
+        "locals"
+      ],
+      "properties": {
+        "method": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "locals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/named"
+          }
+        },
+        "returnValue": {
+          "$ref": "#/$defs/value"
+        }
+      }
+    },
+    "named": {
+      "type": "object",
+      "required": [
+        "name",
+        "value"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/value"
+        }
+      }
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "type",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "prim"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "type": [
+                "number",
+                "boolean",
+                "string"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind",
+            "id"
+          ],
+          "properties": {
+            "kind": {
+              "const": "ref"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "null"
+            }
+          }
+        }
+      ]
+    },
+    "heapObject": {
+      "type": "object",
+      "required": [
+        "kind",
+        "className"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "array",
+            "object",
+            "string",
+            "list",
+            "map",
+            "boxed"
+          ]
+        },
+        "className": {
+          "type": "string"
+        },
+        "elements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/value"
+          }
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/named"
+          }
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "value"
+            ],
+            "properties": {
+              "key": {
+                "$ref": "#/$defs/value"
+              },
+              "value": {
+                "$ref": "#/$defs/value"
+              }
+            }
+          }
+        },
+        "display": {
+          "type": "string"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

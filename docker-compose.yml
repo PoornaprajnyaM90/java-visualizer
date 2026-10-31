@@ -1,0 +1,6 @@
+# Builds the sandbox image the API launches for every run (the API itself runs on the host, see README).
+services:
+  sandbox:
+    build: ./sandbox
+    image: java-visualizer-sandbox:latest
+    command: ["true"]

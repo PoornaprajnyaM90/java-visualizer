@@ -1,0 +1,18 @@
+[Unit]
+Description=JavaLens API
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+User=javalens
+WorkingDirectory=/opt/javalens/backend
+EnvironmentFile=/opt/javalens/backend/.env
+ExecStart=/usr/bin/node dist/server.js
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+# Do NOT add PrivateTmp=true: the API writes each job folder under /tmp and the Docker daemon must see the same files.
+
+[Install]
+WantedBy=multi-user.target
