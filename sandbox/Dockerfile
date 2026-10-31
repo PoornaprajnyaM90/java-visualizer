@@ -1,8 +1,8 @@
 # Stage 1: build the JDI tracer jar
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /t
-COPY sandbox/tracer/pom.xml .
-COPY sandbox/tracer/src ./src
+COPY tracer/pom.xml .
+COPY tracer/src ./src
 RUN mvn -q -DskipTests package
 
 # Stage 2: minimal runtime (needs a JDK: javac + JDI)
